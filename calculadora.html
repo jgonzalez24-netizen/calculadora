@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Calculadora</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <main>
+        <h1>Calculadora</h1>
+
+        <div class="head">
+            <output id="calculadora_data" aria-live="polite">0</output>
+        </div>
+
+        <div class="body">
+            <div>
+                <button class="borrar" type="button" onclick="_clear()">C</button>
+            </div>
+
+            <div>
+                <button type="button" onclick="addNumber(7)">7</button>
+                <button type="button" onclick="addNumber(8)">8</button>
+                <button type="button" onclick="addNumber(9)">9</button>
+                <button type="button" onclick="setOperation('/')">÷</button>
+            </div>
+
+            <div>
+                <button type="button" onclick="addNumber(4)">4</button>
+                <button type="button" onclick="addNumber(5)">5</button>
+                <button type="button" onclick="addNumber(6)">6</button>
+                <button type="button" onclick="setOperation('*')">×</button>
+            </div>
+
+            <div>
+                <button type="button" onclick="addNumber(1)">1</button>
+                <button type="button" onclick="addNumber(2)">2</button>
+                <button type="button" onclick="addNumber(3)">3</button>
+                <button type="button" onclick="setOperation('-')">−</button>
+            </div>
+
+            <div>
+                <button type="button" onclick="addNumber(0)">0</button>
+                <button type="button" onclick="addDecimal()">.</button>
+                <button class="igual" type="button" onclick="setOperation('=')">=</button>
+                <button type="button" onclick="setOperation('+')">+</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const data = document.getElementById("calculadora_data");
+
+        let num1 = null;
+        let ope = "";
+        let nuevoNumero = true;
+
+        function _clear() {
+            data.textContent = "0";
+            num1 = null;
+            ope = "";
+            nuevoNumero = true;
+        }
+
+        function addNumber(value) {
+            if (nuevoNumero || data.textContent === "0") {
+                data.textContent = String(value);
+            } else {
+                data.textContent += value;
+            }
+
+            nuevoNumero = false;
+        }
+
+        function addDecimal() {
+            if (nuevoNumero) {
+                data.textContent = "0.";
+                nuevoNumero = false;
+            } else if (!data.textContent.includes(".")) {
+                data.textContent += ".";
+            }
+        }
+
+        function mensajeError(mensaje) {
+            _clear();
+            data.textContent = mensaje;
+        }
+
+        function calcular(num2) {
+            let resultado;
+
+            switch (ope) {
+                case "+":
+                    resultado = num1 + num2;
+                    break;
+
+                case "-":
+                    resultado = num1 - num2;
+                    break;
+
+                case "*":
+                    resultado = num1 * num2;
+                    break;
+
+                case "/":
+                    if (num2 === 0) {
+                        mensajeError("No se puede dividir entre cero");
+                        return false;
+                    }
+
+                    resultado = num1 / num2;
+                    break;
+            }
+
+            if (!Number.isFinite(resultado)) {
+                mensajeError("El resultado está fuera de rango");
+                return false;
+            }
+
+            data.textContent = String(Number(resultado.toPrecision(15)));
+            return true;
+        }
+
+        function setOperation(_ope) {
+            const valor = Number(data.textContent);
+
+            if (!Number.isFinite(valor)) {
+                return;
+            }
+
+            if (_ope === "=") {
+                if (ope === "" || nuevoNumero) {
+                    return;
+                }
+
+                calcular(valor);
+
+                num1 = null;
+                ope = "";
+                nuevoNumero = true;
+                return;
+            }
+
+            if (ope !== "" && !nuevoNumero) {
+                if (!calcular(valor)) {
+                    return;
+                }
+            }
+
+            num1 = Number(data.textContent);
+            ope = _ope;
+            nuevoNumero = true;
+        }
+    </script>
+</body>
+</html>
